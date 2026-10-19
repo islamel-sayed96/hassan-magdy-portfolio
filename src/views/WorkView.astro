@@ -1,0 +1,27 @@
+---
+import Base from '../layouts/Base.astro';
+import WorkGrid from '../components/WorkGrid.astro';
+import Contact from '../components/Contact.astro';
+import { ui, type Lang } from '../i18n/ui';
+import { projects, tracks } from '../data/work';
+const { lang } = Astro.props as { lang: Lang };
+const t = ui[lang];
+const count = (k: string) => projects.filter((p) => p.track === k).length;
+---
+<Base lang={lang} page="work" title={t.meta.work.title} description={t.meta.work.description}>
+  <div class="wrap">
+    <header class="page-head">
+      <span class="mono">{projects.length} · {t.nav.work}</span>
+      <h1 class="page-title">{t.nav.work}</h1>
+      <p>{t.workPageLede}</p>
+    </header>
+    <div class="filters" role="group" aria-label={t.nav.work} data-filters>
+      <button type="button" class="chip" data-cat="all" aria-pressed="true">{t.all} <sup>{projects.length}</sup></button>
+      {tracks.map((k) => (
+        <button type="button" class={`chip t-${k}`} data-cat={k} aria-pressed="false"><i></i>{t.tracks[k]} <sup>{count(k)}</sup></button>
+      ))}
+    </div>
+    <WorkGrid lang={lang} items={projects} />
+  </div>
+  <Contact lang={lang} />
+</Base>

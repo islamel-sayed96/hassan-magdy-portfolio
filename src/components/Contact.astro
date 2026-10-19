@@ -1,0 +1,35 @@
+---
+import { ui, type Lang } from '../i18n/ui';
+import { site, whatsapp } from '../data/site';
+const { lang } = Astro.props as { lang: Lang };
+const t = ui[lang];
+const channels = [
+  site.email && { label: t.email, href: `mailto:${site.email}`, text: site.email, copy: site.email },
+  whatsapp && { label: t.whatsapp, href: whatsapp, text: site.phone, copy: site.phone },
+  site.instagram && { label: t.instagram, href: site.instagram, text: `@${site.handle}`, copy: `@${site.handle}` },
+].filter(Boolean) as { label: string; href: string; text: string; copy: string }[];
+---
+<section class="section contact wrap" id="contact" aria-labelledby="contact-h">
+  <span class="mono rec-dot">REC</span>
+  <h2 class="big-cta" id="contact-h">{t.contactTitle[0]}<br /><em>{t.contactTitle[1]}</em></h2>
+  <p class="contact-lede">{t.contactLede}</p>
+  {channels.length ? (
+    <div class="channels">
+      {channels.map((c) => (
+        <div class="channel">
+          <span class="mono">{c.label}</span>
+          <a class="val" href={c.href} target={c.href.startsWith('mailto') ? undefined : '_blank'} rel="noopener" dir="ltr">{c.text}</a>
+          <button class="copy" type="button" data-copy={c.copy} data-done={t.copied}>{t.copy}</button>
+        </div>
+      ))}
+    </div>
+  ) : (
+    <p class="mono soon-note">{t.contactSoon}</p>
+  )}
+  {(site.cv || site.portfolioPdf) && (
+    <div class="docs">
+      {site.cv && <a class="btn solid" href={site.cv} target="_blank" rel="noopener">{t.cv} <span class="arrow">→</span></a>}
+      {site.portfolioPdf && <a class="btn" href={site.portfolioPdf} target="_blank" rel="noopener">{t.portfolioPdf} <span class="arrow">→</span></a>}
+    </div>
+  )}
+</section>

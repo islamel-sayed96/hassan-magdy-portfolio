@@ -1,0 +1,53 @@
+---
+import Base from '../layouts/Base.astro';
+import Logo from '../components/Logo.astro';
+import Contact from '../components/Contact.astro';
+import { ui, type Lang } from '../i18n/ui';
+import { site, places, tools } from '../data/site';
+import { tracks } from '../data/work';
+const { lang } = Astro.props as { lang: Lang };
+const t = ui[lang];
+---
+<Base lang={lang} page="about" title={t.meta.about.title} description={t.meta.about.description}>
+  <div class="wrap">
+    <header class="page-head">
+      <span class="mono">{t.aboutKicker}</span>
+      <h1 class="page-title">{lang === 'ar' ? 'حسن مجدي' : site.fullName}</h1>
+    </header>
+    <div class="about">
+      <div class="portrait" data-reveal>
+        <Logo />
+        <span class="mono">{t.portraitNote}</span>
+        <span class="corner c1"></span><span class="corner c2"></span><span class="corner c3"></span><span class="corner c4"></span>
+      </div>
+      <div class="bio">
+        {t.bio.map((p) => <p>{p}</p>)}
+        <ul class="roles mono">{t.roles.map((r, i) => <li class={`t-${tracks[i]}`}><i></i>{r}</li>)}</ul>
+        <dl class="kit">
+          <div><dt>{t.hometownTitle}</dt><dd>{places.from[lang]}</dd></div>
+          <div><dt>{t.basedTitle}</dt><dd>{places.now[lang]}</dd></div>
+          <div><dt>{t.toolsTitle}</dt><dd>{tools.join(' · ')}</dd></div>
+          <div><dt>{t.languagesTitle}</dt><dd>{t.languages}</dd></div>
+        </dl>
+        {(site.cv || site.portfolioPdf) && (
+          <div class="docs">
+            {site.cv && <a class="btn solid" href={site.cv} target="_blank" rel="noopener">{t.cv} <span class="arrow">→</span></a>}
+            {site.portfolioPdf && <a class="btn" href={site.portfolioPdf} target="_blank" rel="noopener">{t.portfolioPdf} <span class="arrow">→</span></a>}
+          </div>
+        )}
+      </div>
+    </div>
+
+    {t.history.length > 0 && (
+      <section class="section" aria-labelledby="hist-h">
+        <div class="sec-head"><h2 id="hist-h">{t.historyTitle}</h2></div>
+        <ol class="history">
+          {t.history.map((h) => (
+            <li data-reveal><span class="yrs">{h.years}</span><span class="role">{h.role}</span><span class="place">{h.place}</span></li>
+          ))}
+        </ol>
+      </section>
+    )}
+  </div>
+  <Contact lang={lang} />
+</Base>

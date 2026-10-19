@@ -1,0 +1,21 @@
+---
+// A looping motion piece built in CSS. It fills the hero monitor until the real showreel is added,
+// and runs on the same 8-second loop as the hero timeline's playhead.
+import { ui, type Lang } from '../i18n/ui';
+const { lang } = Astro.props as { lang: Lang };
+const words = ui[lang].verbs.map((w) => w.replace(/[.。]$/, ''));
+---
+<div class="comp" aria-hidden="true">
+  <div class="comp-grid"></div>
+  <span class="comp-orb"></span>
+  <span class="comp-ring"></span>
+  <span class="comp-square"></span>
+  <svg class="comp-path" viewBox="0 0 160 90" preserveAspectRatio="none"><path d="M-5 70 C 30 70, 40 20, 80 30 S 130 80, 165 18" /></svg>
+  <div class="comp-bars">{Array.from({ length: 9 }, (_, i) => <i style={`--i:${i}`}></i>)}</div>
+  <div class="comp-words">
+    <span class="w w1">{words[0]}</span>
+    <span class="w w2">{words[1]}</span>
+    <span class="w w3">{words[2]}</span>
+  </div>
+  <span class="comp-flash"></span>
+</div>

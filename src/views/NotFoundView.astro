@@ -1,0 +1,15 @@
+---
+import Base from '../layouts/Base.astro';
+import { ui, path, type Lang } from '../i18n/ui';
+const { lang } = Astro.props as { lang: Lang };
+const t = ui[lang];
+---
+<Base lang={lang} page="404" title={`404 · ${t.notFoundTitle}`} description={t.notFoundText}>
+  <div class="wrap page-head offline">
+    <div class="offline-card" aria-hidden="true"><span>MEDIA OFFLINE</span></div>
+    <span class="mono">404</span>
+    <h1 class="page-title">{t.notFoundTitle}</h1>
+    <p>{t.notFoundText}</p>
+    <div><a class="btn" href={path(lang)}>{t.backHome} <span class="arrow">→</span></a></div>
+  </div>
+</Base>

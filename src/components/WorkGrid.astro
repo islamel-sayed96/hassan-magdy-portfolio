@@ -1,0 +1,40 @@
+---
+import { poster, img, viewUrl, type Project } from '../data/work';
+import { ui, type Lang } from '../i18n/ui';
+
+interface Props { lang: Lang; items: Project[] }
+const { lang, items } = Astro.props;
+const t = ui[lang];
+---
+<div class="work" data-sheet>
+  {items.map((p, i) => {
+    const ready = Boolean(p.id);
+    const title = lang === 'ar' && p.titleAr ? p.titleAr : p.title;
+    const label = `${title} · ${t.tracks[p.track]}`;
+    const Tag = ready ? 'a' : 'div';
+    const attrs = !ready ? {} : p.kind === 'video'
+      ? { href: viewUrl(p.id), target: '_blank', rel: 'noopener', 'data-video': p.id, 'data-title': title, 'data-cursor': t.watch }
+      : { href: viewUrl(p.id), target: '_blank', rel: 'noopener', 'data-lightbox': p.id, 'data-caption': title, 'data-cursor': t.view };
+    return (
+      <article class={`card t-${p.track}`} data-track={p.track} data-reveal>
+        <Tag class="card-frame" style={`aspect-ratio:${p.ratio.replace(':', '/')}`} {...attrs} aria-label={ready ? label : undefined}>
+          {ready ? (
+            <img src={p.kind === 'video' ? poster(p.id, 960) : img(p.id, 960)} alt={label} loading="lazy" decoding="async" data-drive={p.id} />
+          ) : (
+            <span class="slate" aria-hidden="true">
+              <span class="slate-num">{String(i + 1).padStart(2, '0')}</span>
+              <span class="slate-ratio">{p.ratio}</span>
+              <span class="slate-keys"><i></i><i></i><i></i><i></i></span>
+            </span>
+          )}
+          <span class="card-tag">{ready ? t.trackShort[p.track] : t.soon}</span>
+          {ready && p.kind === 'video' && <span class="mini-play" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M5 3l16 9-16 9z"/></svg></span>}
+        </Tag>
+        <div class="card-meta">
+          <h3>{title}</h3>
+          <span class="mono">{[p.client, p.year].filter(Boolean).join(' · ') || t.tracks[p.track]}</span>
+        </div>
+      </article>
+    );
+  })}
+</div>

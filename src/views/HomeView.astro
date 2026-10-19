@@ -1,0 +1,149 @@
+---
+import Base from '../layouts/Base.astro';
+import MotionComp from '../components/MotionComp.astro';
+import HeroTimeline from '../components/HeroTimeline.astro';
+import WorkGrid from '../components/WorkGrid.astro';
+import Contact from '../components/Contact.astro';
+import { ui, path, type Lang } from '../i18n/ui';
+import { projects, showreel, tracks, poster, viewUrl } from '../data/work';
+import { site, places, tools, clients, yearsActive } from '../data/site';
+
+const { lang } = Astro.props as { lang: Lang };
+const t = ui[lang];
+const featured = projects.filter((p) => p.featured);
+const name = lang === 'ar' ? ['حسن', 'مجدي'] : ['Hassan', 'Magdy'];
+// Latin names animate letter by letter; Arabic stays whole so the letters keep joining.
+const split = (w: string) => (lang === 'ar' ? [w] : [...w]);
+---
+<Base lang={lang} page="" title={t.meta.home.title} description={t.meta.home.description}>
+  {showreel.id && <link slot="head" rel="preload" as="image" href={poster(showreel.id, 1600)} fetchpriority="high" />}
+
+  <section class="hero wrap" aria-labelledby="hero-h">
+    <div class="hero-copy">
+      <ul class="roles mono" data-hero-fade>
+        {t.roles.map((r, i) => <li class={`t-${tracks[i]}`}><i></i>{r}</li>)}
+      </ul>
+      <h1 class="name" id="hero-h" data-hero-name aria-label={name.join(' ')}>
+        {name.map((w, i) => (
+          <span class={`line${i ? ' alt' : ''}`} aria-hidden="true">
+            {split(w).map((ch, j, all) => <span class="ch" style={`--i:${j};--n:${all.length}`}>{ch}</span>)}
+            {i === 1 && <span class="kf" aria-hidden="true"></span>}
+          </span>
+        ))}
+      </h1>
+      <p class="verbs" data-hero-fade>
+        {t.verbs.map((v, i) => <span class={`verb t-${tracks[i]}`} data-verb={tracks[i]}>{v}</span>)}
+      </p>
+      <p class="lede" data-hero-fade>{t.heroLede}</p>
+      <div class="hero-ctas" data-hero-fade>
+        <a class="btn solid" href="#contact">{t.ctaHire} <span class="arrow">→</span></a>
+        <a class="btn ghost" href={path(lang, 'work')}>{t.ctaWork}</a>
+      </div>
+    </div>
+
+    <div class="hero-edit" data-hero-monitor>
+      <div class="monitor" dir="ltr">
+        {showreel.id ? (
+          <a class="screen" href={viewUrl(showreel.id)} target="_blank" rel="noopener" data-video={showreel.id} data-inline data-title={showreel.title} data-cursor={t.watch} aria-label={t.reelPlay}>
+            <img src={poster(showreel.id, 1600)} alt={showreel.title} fetchpriority="high" decoding="async" data-drive={showreel.id} />
+            <span class="play" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M5 3l16 9-16 9z"/></svg></span>
+          </a>
+        ) : (
+          <div class="screen" role="img" aria-label={t.reelSoon}><MotionComp lang={lang} /></div>
+        )}
+        <span class="safe" aria-hidden="true"></span>
+        <span class="hud" aria-hidden="true">
+          <span class="hud-row"><span><b class="live"></b>{t.monitor} · {showreel.title}</span><span>1920×1080 · 25p</span></span>
+          <span class="hud-row"><span data-tc>00:00:00:00</span><span>{showreel.id ? t.reelPlay : t.reelSoon}</span></span>
+        </span>
+      </div>
+      <HeroTimeline lang={lang} />
+    </div>
+  </section>
+
+  <div class="ticker" aria-label={`${t.toolsTitle}: ${tools.join(', ')}`}>
+    <div class="ticker-track" aria-hidden="true">
+      {[...tools, ...tools, ...tools, ...tools].map((tool, i) => (<><span>{tool}</span><i class={`t-${tracks[i % 3]}`}></i></>))}
+    </div>
+  </div>
+
+  <section class="section wrap" aria-labelledby="work-h" data-marker={t.nav.work}>
+    <div class="sec-head"><span class="mono">01</span><h2 id="work-h">{t.workTitle}</h2><p>{t.workLede}</p></div>
+    <WorkGrid lang={lang} items={featured} />
+    <div class="sec-foot"><a class="btn" href={path(lang, 'work')}>{t.seeAllWork} <span class="arrow">→</span></a></div>
+  </section>
+
+  <section class="section wrap" aria-labelledby="svc-h" data-marker={t.servicesTitle}>
+    <div class="sec-head"><span class="mono">02</span><h2 id="svc-h">{t.servicesTitle}</h2><p>{t.servicesLede}</p></div>
+    <div class="tracks">
+      {tracks.map((k, i) => (
+        <article class={`track t-${k}`} data-reveal>
+          <header>
+            <span class="mono">V{i + 1}</span>
+            <h3>{t.tracks[k]}</h3>
+          </header>
+          <p>{t.services[k].text}</p>
+          <ul>{t.services[k].items.map((it) => <li>{it}</li>)}</ul>
+          <span class="track-clip" aria-hidden="true"><i></i></span>
+        </article>
+      ))}
+    </div>
+  </section>
+
+  <section class="section process-sec" aria-labelledby="proc-h" data-marker={t.processTitle}>
+    <div class="wrap">
+      <div class="sec-head"><span class="mono">03</span><h2 id="proc-h">{t.processTitle}</h2><p>{t.processLede}</p></div>
+      <ol class="process" data-process>
+        {t.process.map((s, i) => (
+          <li class="step" data-step>
+            <span class="mono">{`00:0${i * 2}:00`}</span>
+            <h3>{s.title}</h3>
+            <p>{s.text}</p>
+          </li>
+        ))}
+        <span class="process-head" aria-hidden="true"></span>
+      </ol>
+    </div>
+  </section>
+
+  <section class="section wrap" aria-labelledby="fmt-h">
+    <div class="sec-head"><span class="mono">04</span><h2 id="fmt-h">{t.formatsTitle}</h2><p>{t.formatsLede}</p></div>
+    <div class="formats">
+      {t.formats.map((f) => (
+        <figure class="format" data-reveal>
+          <span class="format-box" style={`aspect-ratio:${f.ratio.replace(':', '/')}`}><b>{f.ratio}</b></span>
+          <figcaption class="mono">{f.label}</figcaption>
+        </figure>
+      ))}
+    </div>
+  </section>
+
+  <section class="section wrap route-sec" aria-labelledby="route-h" data-marker={t.routeTitle}>
+    <div class="route" data-reveal>
+      <div class="city">
+        <span class="mono">{t.from}</span>
+        <b>{places.from[lang]}</b>
+        <span class="mono" dir="ltr">{places.from.coords}</span>
+      </div>
+      <svg class="route-arc" viewBox="0 0 400 120" preserveAspectRatio="none" aria-hidden="true">
+        <path d="M10 100 Q 200 -40 390 100" pathLength="1" data-route />
+        <circle cx="10" cy="100" r="5" /><circle cx="390" cy="100" r="5" />
+      </svg>
+      <div class="city">
+        <span class="mono">{t.now}</span>
+        <b>{places.now[lang]}</b>
+        <span class="mono"><span dir="ltr">{places.now.coords}</span> · {t.localTime} <span dir="ltr" data-clock>--:--</span></span>
+      </div>
+    </div>
+    <div class="sec-head route-head"><h2 id="route-h">{t.routeTitle}</h2><p>{t.routeLede}</p></div>
+    {(clients.length > 0 || yearsActive > 0) && (
+      <div class="also">
+        {yearsActive > 0 && <span class="mono">{yearsActive}+ · {site.since}</span>}
+        {clients.length > 0 && <span class="mono">{t.clientsTitle}</span>}
+        {clients.map((c) => <span>{c}</span>)}
+      </div>
+    )}
+  </section>
+
+  <Contact lang={lang} />
+</Base>

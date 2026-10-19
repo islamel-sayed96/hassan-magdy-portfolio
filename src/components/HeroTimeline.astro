@@ -1,0 +1,47 @@
+---
+// The editing-timeline panel under the hero monitor. Purely decorative.
+import { ui, type Lang } from '../i18n/ui';
+const { lang } = Astro.props as { lang: Lang };
+const t = ui[lang];
+
+// Clips as [start %, length %, label]
+const rows = [
+  { key: 'design', name: 'V3', clips: [[4, 18, 'GFX'], [38, 14, 'Title'], [70, 24, 'End card']] },
+  { key: 'motion', name: 'V2', clips: [[10, 22, 'Logo'], [45, 20, 'Lower 3rd'], [72, 12, 'Kinetic']] },
+  { key: 'edit', name: 'V1', clips: [[0, 28, 'A-cam'], [28, 16, 'B-roll'], [44, 30, 'Interview'], [74, 26, 'Drone']] },
+] as const;
+
+// A deterministic waveform so every build looks the same.
+let seed = 7;
+const rand = () => ((seed = (seed * 9301 + 49297) % 233280) / 233280);
+const wave = Array.from({ length: 140 }, (_, i) => {
+  const env = 0.35 + 0.65 * Math.abs(Math.sin(i / 11));
+  return Math.max(0.08, env * (0.4 + rand() * 0.6));
+});
+const ticks = Array.from({ length: 9 }, (_, i) => `00:0${i}`);
+---
+<div class="tl" dir="ltr" aria-hidden="true" data-tl>
+  <div class="tl-ruler">
+    <span class="tl-name"></span>
+    <div class="tl-ticks">{ticks.map((tc) => <span>{tc}</span>)}</div>
+  </div>
+  {rows.map((r) => (
+    <div class={`tl-row t-${r.key}`} data-track={r.key}>
+      <span class="tl-name"><b>{r.name}</b><small>{t.trackShort[r.key]}</small></span>
+      <div class="tl-lane">
+        {r.clips.map(([s, w, label]) => (
+          <span class="clip" style={`left:${s}%;width:${w}%`}><i></i>{label}<i></i></span>
+        ))}
+      </div>
+    </div>
+  ))}
+  <div class="tl-row t-audio">
+    <span class="tl-name"><b>A1</b><small>Audio</small></span>
+    <div class="tl-lane">
+      <svg class="wave" viewBox="0 0 140 20" preserveAspectRatio="none">
+        {wave.map((h, i) => <rect x={i + 0.15} y={10 - h * 9} width="0.7" height={h * 18} />)}
+      </svg>
+    </div>
+  </div>
+  <div class="tl-head"><span></span></div>
+</div>
